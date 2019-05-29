@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <title>HH monitoring system</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="./stylesheets/main.css">
+
+</head>
+<body>
+        <div class="bs-example">
+                <nav class="navbar navbar-expand-md navbar-light bg-light">
+                    <a href="/" class="navbar-brand">Home & Health</a>
+                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div id="navbarCollapse" class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Sistemi</a>
+                                <div class="dropdown-menu">
+                                    <a href="/home" class="dropdown-item">Home</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="/all" class="dropdown-item">All</a>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Strumenti</a>
+                                    <div class="dropdown-menu">
+                                        <a href="/temp", class="dropdown-item">Grafico temperatura</a>
+                                        <a href="showHeartBeat()" class="dropdown-item">Grafico battito cardiaco</a>
+                                    </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+
+    <header class="page-header header container-fluid">
+            <div class="overlay"></div>
+            <div class="description" style="position: absolute; top: 13%">
+                    <h1>Health monitoring page</h1>
+                    <p style="text-align: left">Da questa pagina è possibile accendere e spegnere il sistema di health monitoring, attivare e disattivare la sleep mode, monitorare i valori attraverso la tabella sottostante e inoltre dal menù strumenti è possibile visionare alcuni grafici.
+                    </p>
+                    <button type="button" class="btn btn-success">On</button>
+                    <button type="button" class="btn btn-danger">Off</button>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                            <button type="button" class="btn btn-secondary">OnSleep</button>
+                            <button type="button" class="btn btn-secondary">OffSleep</button>
+                    </div>
+
+            </div>
+            <table id="tableHealth" class="table table-bordered" style="position: relative; top:30%; width: 50%;left: 25%">
+                    <thead>
+                        <tr>
+                        <th scope="col">Sensore</th>
+                        <th scope="col">Valore</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                        <td>Vibrazioni</td>
+                        <td>valore ...</td>
+                        </tr>
+                        <tr>
+                        <td>Tilt</td>
+                        <td>valore ...</td>
+                        </tr>
+                        <tr>
+                        <td>Distanza</td>
+                        <td>valore ...</td>
+                        </tr>
+                        <tr>
+                        <td>Chiamata</td>
+                        <td>valore ...</td>
+                        </tr>
+                        <tr>
+                        <td>Temperatura</td>
+                        <td>valore ...</td>
+                        </tr>
+                        <tr>
+                        <td>Heart</td>
+                        <td>valore ...</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="tempChart", style="position: absolute; top: 30%; width: 30%; display: none;">
+                        <canvas id="myChart"height="450" width="600"></canvas>
+                        <button onclick="nextData()",  type="button" class="btn btn-secondary">Nuovo Dato</button>
+                </div>
+
+<!--             aggiungere grafici:
+                * temperatura
+                * battito cardiaco-->
+    </header>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script>
+
+        var socket = io.connect('http://localhost:8080');
+
+        function showTemp(){
+            $("#tempChart").css("display", "inline");
+            $("#tableHealth").css("display", "none");
+            $(".description").css("display", "none");
+        }
+
+        function nextData(){
+            socket.emit('simulate', 'simula');
+        }
+
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            // The type of chart we want to create
+            type: 'line',
+            // The data for our dataset
+            data: {
+                labels: [],
+                datasets: [{
+                    label: "Temperature",
+                    borderColor: "#FF5733",
+                    data: [],
+                    fill: false,
+                    pointStyle: 'circle',
+                    backgroundColor: '#3498DB',
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    lineTension: 0,
+                }]
+            },
+            // Configuration options go here
+            options: {}
+        });
+                           
+        socket.on('temp', function(data) { //As a temp data is received 
+            console.log(data.temp);
+            //document.getElementById('date').innerHTML = data.date; //update the date
+            if(chart.data.labels.length != 15) { //If we have less than 15 data points in the graph
+                chart.data.labels.push(data.time);  //Add time in x-asix
+                chart.data.datasets.forEach((dataset) => {
+                    dataset.data.push(data.temp); //Add temp in y-axis
+                });
+            }
+            else { //If there are already 15 data points in the graph.
+                chart.data.labels.shift(); //Remove first time data
+                chart.data.labels.push(data.time); //Insert latest time data
+                chart.data.datasets.forEach((dataset) => {
+                    dataset.data.shift(); //Remove first temp data
+                    dataset.data.push(data.temp); //Insert latest temp data
+                });
+            }
+            chart.update(); //Update the graph.
+        });
+    </script>
+
+    <script src="./javascripts/jquery-3.4.1.min.js"></script>
+    <script src="./bootstrap/js/bootstrap.min.js"></script>
+    <script src="./javascripts/main.js"></script>
+  
+</body>
+</html>

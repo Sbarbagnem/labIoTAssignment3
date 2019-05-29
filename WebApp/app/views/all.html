@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <title>HH monitoring system</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="./stylesheets/main.css">
+
+</head>
+<body>
+        <div class="bs-example">
+                <nav class="navbar navbar-expand-md navbar-light bg-light">
+                    <a href="/" class="navbar-brand">Home & Health</a>
+                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div id="navbarCollapse" class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Sistemi</a>
+                                <div class="dropdown-menu">
+                                    <a href="/home" class="dropdown-item">Home</a>
+                                    <a href="/health" class="dropdown-item">Health</a>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Strumenti</a>
+                                    <div class="dropdown-menu">
+                                        <a href="#" class="dropdown-item">Grafico temperatura casa</a>
+                                        <a href="#" class="dropdown-item">Grafico luce</a>
+                                        <a href="#" class="dropdown-item">Grafico suono</a>
+                                        <a href="#" class="dropdown-item">Grafico temperatura</a>
+                                        <a href="#" class="dropdown-item">Grafico battito cardiaco</a>
+                                    </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+
+    <header class="page-header header container-fluid">
+            <div class="overlay"></div>
+
+             <div class="modal-body row" id="prova">
+                    <div class="col-md-6">
+                            <h2>Home monitoring</h2>
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Basic example"> 
+                                    <button type="button" class="btn btn-success">On</button>
+                                    <button type="button" class="btn btn-danger">Off</button>
+                            </div>
+                            <table class="table table-bordered" id="table-home">
+                                <thead>
+                                    <tr>
+                                    <th scope="col">Sensore</th>
+                                    <th scope="col">Valore</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                    <td>Temperatura</td>
+                                    <td>valore ...</td>
+                                    </tr>
+                                    <tr>
+                                    <td>Suono</td>
+                                    <td>valore ...</td>
+                                    </tr>
+                                    <tr>
+                                    <td>Luce</td>
+                                    <td>valore ...</td>
+                                    </tr>
+                                    <tr>
+                                    <td>WiFi</td>
+                                    <td>valore ...</td>
+                                    </tr>
+                                    <tr>
+                                    <td>Fiamme</td>
+                                    <td>valore ...</td>
+                                    </tr>
+                                    <tr>
+                                    <td>Distanza</td>
+                                    <td>valore ...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                    <div class="col-md-6">
+                            <h2>Health monitoring</h2>
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Basic example"> 
+                                    <button type="button" class="btn btn-success">On</button>
+                                    <button type="button" class="btn btn-danger">Off</button>
+                                    <button type="button" class="btn btn-secondary">OnSleep</button>
+                                    <button type="button" class="btn btn-secondary">OffSleep</button>
+                            </div>
+                            <table class="table table-bordered" id="table-home">
+                                    <thead>
+                                        <tr>
+                                        <th scope="col">Sensore</th>
+                                        <th scope="col">Valore</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                        <td>Vibrazioni</td>
+                                        <td>valore ...</td>
+                                        </tr>
+                                        <tr>
+                                        <td>Tilt</td>
+                                        <td>valore ...</td>
+                                        </tr>
+                                        <tr>
+                                        <td>Distanza</td>
+                                        <td>valore ...</td>
+                                        </tr>
+                                        <tr>
+                                        <td>Chiamata</td>
+                                        <td>valore ...</td>
+                                        </tr>
+                                        <tr>
+                                        <td>Temperatura</td>
+                                        <td>valore ...</td>
+                                        </tr>
+                                        <tr>
+                                        <td>Heart</td>
+                                        <td>valore ...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                    </div>
+                </div>
+    </header>
+
+    <script src="./javascripts/jquery-3.4.1.min.js"></script>
+    <script src="./bootstrap/js/bootstrap.min.js"></script>
+    <script src="./javascripts/main.js"></script>
+</body>
+</html>

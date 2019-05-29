@@ -1,0 +1,49 @@
+.bs-example{
+    margin: 20px;
+}
+
+.header {
+    /*background-image: url('images/health.png');*/
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+.description {
+    left: 50%;
+    position: absolute;
+    top: 20%;
+    transform: translate(-50%, -55%);
+    text-align: center;
+}
+  
+.description h1 {
+    color: #6ab446;
+}
+
+.description p {
+    color: #000;
+    font-size: 1.3rem;
+    line-height: 1.5;
+}
+
+.button-on-off {
+    position: relative;
+}
+
+#prova{
+    position: relative;
+    top: 0%;
+    text-align: center;
+}
+
+#table-home{
+    position: relative;
+    top: 2%;
+}
+
+.chart {
+    position: relative;
+    top: 30%;
+    width: 30%;
+    display: none;
+}

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <title>HH monitoring system</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="./stylesheets/main.css">
+  <script src="./javascripts/jquery-3.4.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+
+</head>
+<body>
+        <div class="bs-example">
+                <nav class="navbar navbar-expand-md navbar-light bg-light">
+                    <a href="/" class="navbar-brand">Home & Health</a>
+                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div id="navbarCollapse" class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Sistemi</a>
+                                <div class="dropdown-menu">
+                                    <a href="health" class="dropdown-item">Health</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="all" class="dropdown-item">All</a>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-toggle="dropdown">Strumenti</a>
+                                    <div class="dropdown-menu">
+                                        <a id="showChartTemp" class="dropdown-item">Grafico temperatura</a>
+                                        <a id="showChartLight" class="dropdown-item">Grafico luce</a>
+                                        <a id="showChartSound" class="dropdown-item">Grafico suono</a>
+                                    </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+
+    <header class="page-header header container-fluid">
+        <div class="overlay"></div>
+        <div class="description" style="position: absolute; top: 20%">
+            <h1 style="text-align: left">Home monitoring page</h1>
+            <p style="text-align: left">Da questa pagina è possibile accendere e spegnere il sistema di home monitoring, monitorare i valori attraverso la tabella sottostante e inoltre dal menù strumenti è possibile visionare alcuni grafici.
+            </p>
+            <a type="button" id="buttonOn" class="btn btn-success">On</a>
+            <a type="button" id="buttonOff" class="btn btn-danger">Off</a>
+        </div>
+        <table class="table table-bordered" style="position: relative; top:35%; width: 50%;left: 25%">
+                <thead>
+                    <tr>
+                    <th scope="col">Sensore</th>
+                    <th scope="col">Valore</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td>Temperatura</td>
+                    <td id="temp">valore ...</td>
+                    </tr>
+                    <tr>
+                    <td>Suono</td>
+                    <td id="suono">valore ...</td>
+                    </tr>
+                    <tr>
+                    <td>Luce</td>
+                    <td id="luce">valore ...</td>
+                    </tr>
+                    <tr>
+                    <td>WiFi</td>
+                    <td id="wifi">valore ...</td>
+                    </tr>
+                    <tr>
+                    <td>Fiamme</td>
+                    <td id="fiamma">valore ...</td>
+                    </tr>
+                    <tr>
+                    <td>Distanza</td>
+                    <td id="distanza">valore ...</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="position: absolute; top: 90%; width: 100%; height: 15%;">
+                <div style="position: absolute; width: 30%; left: 5%;">
+                    <canvas id="canvas_temp" width="50" height="50" ></canvas>
+                </div>
+                <div style="position: absolute; width: 30%; right: 5%;">
+                    <canvas id="canvas_light" width="50" height="50"></canvas>
+                </div>
+            </div>
+
+    </header>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+
+        const socket = io();
+
+        var chart = false;
+
+        var buttonOn = document.getElementById('buttonOn');
+        var buttonOff = document.getElementById('buttonOff');
+        var cell_temp = document.getElementById('temp');
+        var cell_suono = document.getElementById('suono');
+        var cell_luce = document.getElementById('luce');
+        var cell_wifi = document.getElementById('wifi');
+        var cell_fiamma = document.getElementById('fiamma');
+        var cell_distanza = document.getElementById('distanza');
+        var show_temp = document.getElementById('showChartTemp');
+        var show_light = document.getElementById('showChartLight');
+        var show_sound = document.getElementById('showChartSound');
+        var chart_temperature = document.getElementById('chartTemperature')
+        var chart_sound = document.getElementById('chartSound');
+        var chart_light = document.getElementById('chartLight');
+        var table = document.getElementsByClassName('table');
+        var canvas_temp = document.getElementById("canvas_temp").getContext("2d");
+        var canvas_light = document.getElementById("canvas_light").getContext("2d");
+
+        var n_point = 10;
+
+        var config_temp = {
+			type: 'line',
+			data: {
+				xLabels: [],
+                datasets: [{
+                    label: "Temperature",
+                    borderColor: "#FF5733",
+                    data: [],
+                    fill: false,
+                    pointStyle: 'circle',
+                    backgroundColor: '#3498DB',
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    lineTension: 0,
+                }]
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Chart for Temperature'
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Timestamp'
+						}
+					}],
+					yAxes: [{
+						type: 'category',
+						position: 'left',
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Value temperature'
+						},
+						ticks: {
+							reverse: true
+						}
+					}]
+				}
+			}
+		};
+
+        var config_light = {
+			type: 'line',
+			data: {
+				xLabels: [],
+                datasets: [{
+                    label: "Light",
+                    borderColor: "#FF5733",
+                    data: [],
+                    fill: false,
+                    pointStyle: 'circle',
+                    backgroundColor: '#3498DB',
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    lineTension: 0,
+                }]
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Chart for Light'
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Timestamp'
+						}
+					}],
+					yAxes: [{
+						type: 'category',
+						position: 'left',
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Value light'
+						},
+						ticks: {
+							reverse: true
+						}
+					}]
+				}
+			}
+		};
+
+        buttonOn.addEventListener('click', function(e) {
+
+            console.log('button was clicked');
+
+            fetch('/onMKR', {method: 'POST'})
+                .then(function(response) {
+                if(response.ok) {
+                    return;
+                }
+                throw new Error('Request failed.');
+                })
+                .catch(function(error) {
+                console.log(error);
+                });
+        });
+
+        buttonOff.addEventListener('click', function(e) {
+
+            console.log('button was clicked');
+
+            fetch('/offMKR', {method: 'POST'})
+                .then(function(response) {
+                if(response.ok) {
+                    return;
+                }
+                throw new Error('Request failed.');
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
+        });
+
+        socket.on("valueMkr", (data) =>{
+            console.log(data);
+            cell_distanza.innerHTML = data.distance;
+            cell_fiamma.innerHTML = data.flame;
+            cell_luce.innerHTML = data.light;
+            cell_suono.innerHTML = data.sound;
+            cell_temp.innerHTML = data.temperature;
+            cell_wifi.innerHTML = data.wifi;
+
+            var d = new Date();
+            var hour = d.getHours();
+            var minute = d.getMinutes();
+            var second = d.getSeconds();
+            var dt = hour + ":" + minute + ":" + second;
+
+            if(config_light.data.xLabels.length >= n_point){
+                config_temp.data.xLabels.shift();
+                config_light.data.xLabels.shift();
+                config_temp.data.datasets[0].data.shift();
+                config_light.data.datasets[0].data.shift();
+            }
+
+            config_temp.data.xLabels.push(dt);
+            config_light.data.xLabels.push(dt);
+            config_temp.data.datasets[0].data.push(data.temperature);
+            config_light.data.datasets[0].data.push(data.light);
+
+            new Chart(canvas_temp, config_temp);
+            new Chart(canvas_light, config_light);
+
+        });
+
+    </script>
+
+    <script src="./bootstrap/js/bootstrap.min.js"></script>
+    <script src="./javascripts/main.js"></script>
+</body>
+</html>
